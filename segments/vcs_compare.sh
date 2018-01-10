@@ -45,11 +45,15 @@ __parse_git_stats() {
 	ahead=$2
 
 	# print out the information
+	local ret
 	if [[ $behind -gt 0 ]] ; then
-		local ret="↓ $behind"
+		ret="↓ $behind"
 	fi
 	if [[ $ahead -gt 0 ]] ; then
-		local ret="${ret}↑ $ahead"
+		if [[ -n "$ret" ]]; then
+			ret="${ret} "
+		fi
+		ret="${ret}↑ $ahead"
 	fi
 	echo "$ret"
 }
