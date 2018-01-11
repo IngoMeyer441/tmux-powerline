@@ -46,5 +46,5 @@ run_segment() {
 		esac
 	fi
 
-	echo "⌨  $cur_layout"
+	echo "⌨ $cur_layout"
 }
