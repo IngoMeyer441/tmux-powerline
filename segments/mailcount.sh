@@ -91,7 +91,7 @@ run_segment() {
 	fi
 
 	if [[ -n "$count"  && "$count" -gt 0 ]]; then
-		echo "✉ ${count}"
+		echo " ${count}"
 	fi
 
 	return 0
