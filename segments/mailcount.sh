@@ -4,12 +4,13 @@ TMUX_POWERLINE_SEG_MAILCOUNT_MAILDIR_INBOX_DEFAULT="$HOME/.mail/inbox/new"
 TMUX_POWERLINE_SEG_MAILCOUNT_MBOX_INBOX_DEFAULT="${MAIL}"
 TMUX_POWERLINE_SEG_MAILCOUNT_MAILCHECKRC_DEFAULT="${HOME}/.mailcheckrc"
 TMUX_POWERLINE_SEG_MAILCOUNT_GMAIL_SERVER_DEFAULT="gmail.com"
+TMUX_POWERLINE_SEG_MAILCOUNT_THUNDERBIRD_MAILBOX_PATHS_DEFAULT="${HOME}/.thunderbird/XXX.default-release/ImapMail/imap.exmaplemail.com"
 TMUX_POWERLINE_SEG_MAILCOUNT_GMAIL_INTERVAL_DEFAULT="5"
 
 
 generate_segmentrc() {
 	read -d '' rccontents  << EORC
-# Mailbox type to use. Can be any of {apple_mail, gmail, maildir, mbox, mailcheck}
+# Mailbox type to use. Can be any of {apple_mail, gmail, maildir, mbox, mailcheck, thunderbird}
 export TMUX_POWERLINE_SEG_MAILCOUNT_MAILBOX_TYPE=""
 
 ## Gmail
@@ -38,6 +39,10 @@ export TMUX_POWERLINE_SEG_MAILCOUNT_MBOX_INBOX="${TMUX_POWERLINE_SEG_MAILCOUNT_M
 ## mailcheck
 # Optional path to mailcheckrc
 export TMUX_POWERLINE_SEG_MAILCOUNT_MAILCHECKRC="${TMUX_POWERLINE_SEG_MAILCOUNT_MAILCHECKRC_DEFAULT}"
+
+## thunderbird
+# Paths to the accounts to check (separated by ':')
+export TMUX_POWERLINE_SEG_MAILCOUNT_THUNDERBIRD_MAILBOX_PATHS="${TMUX_POWERLINE_SEG_MAILCOUNT_THUNDERBIRD_MAILBOX_PATHS_DEFAULT}"
 EORC
 	echo "${rccontents}"
 }
@@ -65,6 +70,11 @@ __process_settings() {
 		export TMUX_POWERLINE_SEG_MAILCOUNT_MAILCHECKRC="${TMUX_POWERLINE_SEG_MAILCOUNT_MAILCHECKRC_DEFAULT}"
 	fi
 
+	eval TMUX_POWERLINE_SEG_MAILCOUNT_THUNDERBIRD_MAILBOX_PATHS="$TMUX_POWERLINE_SEG_MAILCOUNT_THUNDERBIRD_MAILBOX_PATHS"
+	if [ -z "${TMUX_POWERLINE_SEG_MAILCOUNT_THUNDERBIRD_MAILBOX_PATHS}" ]; then
+		export TMUX_POWERLINE_SEG_MAILCOUNT_THUNDERBIRD_MAILBOX_PATHS="${TMUX_POWERLINE_SEG_MAILCOUNT_THUNDERBIRD_MAILBOX_PATHS_DEFAULT}"
+	fi
+
 }
 
 run_segment() {
@@ -81,6 +91,7 @@ run_segment() {
 		"maildir")  count=$(__count_maildir) ;;
 		"mbox")  count=$(__count_mbox) ;;
 		"mailcheck")  count=$(__count_mailcheck) ;;
+		"thunderbird")  count=$(__count_thunderbird) ;;
 		*)
 			echo "Unknown mailbox type [${TMUX_POWERLINE_SEG_MAILCOUNT_MAILBOX_TYPE}]";
 			return 1
@@ -90,7 +101,7 @@ run_segment() {
 		return $exitcode
 	fi
 
-	if [[ -n "$count"  && "$count" -gt 0 ]]; then
+	if [[ -n "$count"  && "$count" -gt 0 ]] || [[ "$TMUX_POWERLINE_SEG_MAILCOUNT_MAILBOX_TYPE" == "thunderbird" ]]; then
 		echo " ${count}"
 	fi
 
@@ -200,5 +211,16 @@ __count_mailcheck() {
 		echo "$count"
 		return 0
 	fi
+	return 1;
+}
+
+__count_thunderbird() {
+    # Credits go to wognatn, see https://support.mozilla.org/en-US/questions/1242684
+	local path
+	while read -r path; do
+		if tac "${path}/INBOX.msf" | grep -m 1 '(^94=.)' | grep -q -v '(^94=0)'; then
+			return 0
+		fi
+	done < <(tr ':' '\n' <<< "${TMUX_POWERLINE_SEG_MAILCOUNT_THUNDERBIRD_MAILBOX_PATHS}")
 	return 1;
 }
