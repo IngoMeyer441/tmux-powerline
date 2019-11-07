@@ -134,6 +134,29 @@ if set -q TMUX; tmux setenv TMUXPWD_(tmux display -p "#D" | tr -d '%') $PWD; end
 
 If you have a recent version of tmux (&ge; 2.1), there is no need to redefine the PS1 variable since tmux can be called directly to query the working directory of the active pane.
 
+## Rambox specific (rambox notification count segment)
+
+For the ``rambox_notification_count.sh`` segment to work, some Javascript code must be injected to the web service which should be monitored. Select the according service tab in the Rambox app and select *Window* -> *Toggle Developer Tools*. A web console will open which contains the already injected Javascript code by Rambox itself to make the badge count work. Append a piece of source code to send a *POST* request to http://localhost:48321 with ``count=<count>`` as form data. ``count`` must be an integer or ``true`` if the exact count is not known. The appended source code can be added to the *Advanced* setting of the corresponding web service in the *Rambox* tab.
+
+### Example for Mattermost
+
+Go to the *Rambox* tab and edit *Mattermost*. Paste the following code into the *Advanced* code box:
+
+```javascript
+function updateBadge(count) {
+  if (count === true) rambox.setUnreadCount("•");
+  else if (count >= 1) rambox.setUnreadCount(count);
+  else rambox.clearUnreadCount();
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", 'http://localhost:48321', true);
+  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  xhr.send("count=" + count);
+}
+```
+
+This code snippet overwrites the default ``updateBadge`` function of the Mattermost tab to send a POST request on badge
+updates.
+
 # Configuration
 
 The default segments that are shown are defined in `themes/default.sh`. You will probably want to change those to fit your needs. To do so you can edit that file directly but preferable, for easier updating of the repo, you can make a copy and edit that one (or see how to use custom themes directory below). A palette of colors that can be used can be obtained by running the script `color_palette.sh`.
