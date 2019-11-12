@@ -148,7 +148,7 @@ function updateBadge(count) {
   else if (count >= 1) rambox.setUnreadCount(count);
   else rambox.clearUnreadCount();
   var xhr = new XMLHttpRequest();
-  xhr.open("POST", 'http://localhost:48321', true);
+  xhr.open("POST", "http://localhost:48321", true);
   xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
   xhr.send("count=" + count);
 }

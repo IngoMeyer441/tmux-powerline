@@ -31,6 +31,7 @@ run_segment() {
 	count="$( curl "http://localhost:${TMUX_POWERLINE_SEG_RAMBOX_NOTIFICATION_COUNT_PORT}" )"
 	if [[ "$?" -eq 7 ]]; then
 		nohup python3 - <<-EOF >/dev/null 2>&1 &
+			import re
 			from http.server import HTTPServer, BaseHTTPRequestHandler
 			from urllib.parse import parse_qs
 
@@ -38,15 +39,25 @@ run_segment() {
 			PORT = ${TMUX_POWERLINE_SEG_RAMBOX_NOTIFICATION_COUNT_PORT}
 
 
-			class CountRequestHandler(BaseHTTPRequestHandler):
-			    _count = None
+			class CorsRequestHandler(BaseHTTPRequestHandler):
+			    def end_headers(self):
+			        self.send_header("Access-Control-Allow-Origin", "*")
+			        super().end_headers()
+
+
+			class CountRequestHandler(CorsRequestHandler):
+			    _counts = {}
 
 			    def do_GET(self):
 			        cls = self.__class__
-			        if cls._count is not None:
+			        if cls._counts:
 			            self.send_response(200)
 			            self.end_headers()
-			            self.wfile.write("{}".format(cls._count).encode())
+			            if any(count == "true" for count in self._counts.values()):
+			                sum_of_counts = "true"
+			            else:
+			                sum_of_counts = sum(self._counts.values())
+			            self.wfile.write("{}".format(sum_of_counts).encode())
 			        else:
 			            self.send_response(404)
 			            self.end_headers()
@@ -54,22 +65,29 @@ run_segment() {
 			    def do_POST(self):
 			        cls = self.__class__
 			        content_length = int(self.headers["Content-Length"])
-			        post_vars = parse_qs(self.rfile.read(content_length), keep_blank_values=1)
-			        print(post_vars)
-			        if b"count" in post_vars:
-			            self.send_response(201 if cls._count is None else 204)
-			            self.end_headers()
-			            count = post_vars[b"count"][0].decode()
-			            if count.lower() == "true":
-			                cls._count = "true"
-			            else:
-			                try:
-			                    cls._count = int(count)
-			                except ValueError:
-			                    cls._count = 0
+			        post_vars = {
+			            k.decode(): v[0].decode() for k, v in parse_qs(self.rfile.read(content_length), keep_blank_values=1).items()
+			        }
+			        counts_were_empty = not bool(cls._counts)
+			        matched_any = False
+			        for key, value in post_vars.items():
+			            match = re.match(r"^count\d*$", key)
+			            if match:
+			                matched_any = True
+			                count_key = match.group(0)
+			                count = post_vars[count_key]
+			                if count.lower() == "true":
+			                    cls._counts[count_key] = "true"
+			                else:
+			                    try:
+			                        cls._counts[count_key] = int(count)
+			                    except ValueError:
+			                        cls._counts[count_key] = 0
+			        if matched_any:
+			            self.send_response(201 if counts_were_empty else 204)
 			        else:
 			            self.send_response(500)
-			            self.end_headers()
+			        self.end_headers()
 
 
 			def main():
