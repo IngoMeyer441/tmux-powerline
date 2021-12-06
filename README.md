@@ -1,8 +1,26 @@
-# DEPRECATION WARNING
-This project is in a maintenance mode and no future functionality is likely to be added. tmux-powerline, with all other powerline projects, is replaced by the new unifying [powerline](https://github.com/Lokaltog/powerline). However this project is still functional and can serve as a lightweight alternative for non-python users.
-
 # tmux-powerline
-This is a set of scripts for making a nice and dynamic tmux statusbar consisting of segments. This is much like [Lokaltog/vim-powerline](https://github.com/Lokaltog/vim-powerline) but for tmux.
+[![GitHub Stars](https://img.shields.io/github/stars/erikw/tmux-powerline?style=social)](#)
+[![GitHub Forks](https://img.shields.io/github/forks/erikw/tmux-powerline?style=social)](#)
+<br>
+[![SLOC](https://img.shields.io/tokei/lines/github/erikw/tmux-powerline)](#)
+[![Number of programming languages used](https://img.shields.io/github/languages/count/erikw/tmux-powerline)](#)
+[![Top programming languages used](https://img.shields.io/github/languages/top/erikw/tmux-powerline)](#)
+[![Open issues](https://img.shields.io/github/issues/erikw/tmux-powerline)](https://github.com/erikw/tmux-powerline/issues)
+[![Closed issues](https://img.shields.io/github/issues-closed/erikw/tmux-powerline?color=success)](https://github.com/erikw/tmux-powerline/issues?q=is%3Aissue+is%3Aclosed)
+[![Closed PRs](https://img.shields.io/github/issues-pr-closed/erikw/tmux-powerline?color=success)](https://github.com/erikw/tmux-powerline/pulls?q=is%3Apr+is%3Aclosed)
+[![License](https://img.shields.io/badge/license-BSD--3-blue)](LICENSE.txt)
+[![OSS Lifecycle](https://img.shields.io/osslifecycle/erikw/tmux-powerline)](https://github.com/Netflix/osstracker)
+[![Latest tag](https://img.shields.io/github/v/tag/erikw/tmux-powerline)](https://github.com/erikw/tmux-powerline/tags)
+<br>
+
+[![Contributors](https://img.shields.io/github/contributors/erikw/tmux-powerline)](https://github.com/erikw/tmux-powerline/graphs/contributors) including these top contributors:
+<a href = "https://github.com/erikw/tmux-powerline/graphs/contributors">
+<img src = "https://contrib.rocks/image?repo=erikw/tmux-powerline&max=24"/>
+</a>
+
+
+# Intro
+This is a hackable set of scripts for making a nice and dynamic tmux statusbar consisting of segments. This is much like [Lokaltog/vim-powerline](https://github.com/Lokaltog/vim-powerline) but for tmux.
 
 The following segments exists for now:
 * LAN & WAN IP addresses.
@@ -23,7 +41,7 @@ The following segments exists for now:
 # Screenshots
 **Full screenshot**
 
-![Full screenshot](img/full.png)
+<a href="img/full.png" title="Full screenshot"><img src="img/full.png" width="850" alt="Full screenshot"></a>
 
 **left-status**
 
@@ -48,6 +66,10 @@ After pausing the music there's no need for showing NP anymore. Also the weather
 Remaining battery.
 
 ![right-status, weather and battery](img/right-status_weather_battery.png)
+
+# Project Status
+This project is accepting contributions, but currently active development on new features are paused. If you look for a more active project, check out [Lokaltog/powerline](https://github.com/Lokaltog/powerline). However this project is still functional and can serve as a lightweight alternative for those who does not want large dependencies (Lokaltog/powerline requires a Python setup on the system), as this is implemented in bash.
+
 
 # Requirements
 Requirements for the lib to work are:
