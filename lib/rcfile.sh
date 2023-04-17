@@ -15,6 +15,22 @@ process_settings() {
 		export TMUX_POWERLINE_THEME="${TMUX_POWERLINE_THEME_DEFAULT}"
 	fi
 
+	if [ -z "$TMUX_POWERLINE_STATUS_LEFT_LENGTH" ]; then
+		export TMUX_POWERLINE_STATUS_LEFT_LENGTH="${TMUX_POWERLINE_STATUS_LEFT_LENGTH_DEFAULT}"
+	fi
+
+	if [ -z "$TMUX_POWERLINE_STATUS_RIGHT_LENGTH" ]; then
+		export TMUX_POWERLINE_STATUS_RIGHT_LENGTH="${TMUX_POWERLINE_STATUS_RIGHT_LENGTH_DEFAULT}"
+	fi
+
+	if [ -z "$TMUX_POWERLINE_MUTE_LEFT_KEYBINDING" ]; then
+		export TMUX_POWERLINE_MUTE_LEFT_KEYBINDING="${TMUX_POWERLINE_MUTE_LEFT_KEYBINDING_DEFAULT}"
+	fi
+
+	if [ -z "$TMUX_POWERLINE_MUTE_RIGHT_KEYBINDING" ]; then
+		export TMUX_POWERLINE_MUTE_RIGHT_KEYBINDING="${TMUX_POWERLINE_MUTE_RIGHT_KEYBINDING_DEFAULT}"
+	fi
+
 	eval TMUX_POWERLINE_DIR_USER_SEGMENTS="$TMUX_POWERLINE_DIR_USER_SEGMENTS"
 	eval TMUX_POWERLINE_DIR_USER_THEMES="$TMUX_POWERLINE_DIR_USER_THEMES"
 	if [ -n "$TMUX_POWERLINE_DIR_USER_THEMES" ] && [ -f "${TMUX_POWERLINE_DIR_USER_THEMES}/${TMUX_POWERLINE_THEME}.sh" ]; then
@@ -37,12 +53,23 @@ generate_default_rc() {
 	export TMUX_POWERLINE_DEBUG_MODE_ENABLED="${TMUX_POWERLINE_DEBUG_MODE_ENABLED_DEFAULT}"
 	# Use patched font symbols.
 	export TMUX_POWERLINE_PATCHED_FONT_IN_USE="${TMUX_POWERLINE_PATCHED_FONT_IN_USE_DEFAULT}"
+
 	# The theme to use.
 	export TMUX_POWERLINE_THEME="${TMUX_POWERLINE_THEME_DEFAULT}"
 	# Overlay directory to look for themes. There you can put your own themes outside the repo. Fallback will still be the "themes" directory in the repo.
-	export TMUX_POWERLINE_DIR_USER_THEMES=""
+	export TMUX_POWERLINE_DIR_USER_THEMES="\${XDG_CONFIG_HOME:-\$HOME/.config}/tmux-powerline/themes"
 	# Overlay directory to look for segments. There you can put your own segments outside the repo. Fallback will still be the "segments" directory in the repo.
-	export TMUX_POWERLINE_DIR_USER_SEGMENTS=""
+	export TMUX_POWERLINE_DIR_USER_SEGMENTS="\${XDG_CONFIG_HOME:-\$HOME/.config}/tmux-powerline/segments"
+
+	# The maximum length of the left status bar.
+	export TMUX_POWERLINE_STATUS_LEFT_LENGTH="${TMUX_POWERLINE_STATUS_LEFT_LENGTH_DEFAULT}"
+	# The maximum length of the right status bar.
+	export TMUX_POWERLINE_STATUS_RIGHT_LENGTH="${TMUX_POWERLINE_STATUS_RIGHT_LENGTH_DEFAULT}"
+
+	# Uncomment these if you want to enable tmux bindings for muting (hiding) one of the status bars.
+	# E.g. this example binding would mute the left status bar when pressing <prefix> followed by Ctrl-[
+	#export TMUX_POWERLINE_MUTE_LEFT_KEYBINDING="C-["
+	#export TMUX_POWERLINE_MUTE_RIGHT_KEYBINDING="C-]"
 # }
 EORC
 

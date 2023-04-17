@@ -21,23 +21,23 @@
 
 
 # Intro
-This is a hackable set of scripts for making a nice and dynamic tmux statusbar consisting of segments. This is much like [Lokaltog/vim-powerline](https://github.com/Lokaltog/vim-powerline) but for tmux.
+This tmux [tpm](https://github.com/tmux-plugins/tpm) plugin that gives you a slick and hackable powerline status bar consisting of segments. It's easily extensible with custom segments and themes. The plugin itself is implemented purely in bash thus minimizing system requirements. However you can make segments in any language you want (with a shell wrapper).
 
-The following segments exists for now:
-* LAN & WAN IP addresses.
+Some examples of segments available that you can add to your tmux status bar are:
+* LAN & WAN IP addresses
 * Now Playing for MPD, Spotify (GNU/Linux native or wine, OS X), iTunes (OS X), Rhythmbox, Banshee, MOC, Audacious, Rdio (OS X), cmus, Pithos and Last.fm (last scrobbled track).
-* New mail count for GMail, Maildir, mbox, mailcheck, and Apple Mail.
-* GNU/Linux and Macintosh OS X battery status (uses [richo/dotfiles/bin/battery](https://github.com/richoH/dotfiles/blob/master/bin/battery)).
-* Weather in Celsius, Fahrenheit and Kelvin using Yahoo Weather.
-* System load, cpu usage and uptime.
-* Git, SVN and Mercurial branch in CWD.
-* Date and time.
-* Hostname.
-* tmux info.
-* CWD in pane.
-* Current X keyboard layout.
-* Network download/upload speed.
-* Earthquake warnings.
+* New mail count for GMail, Maildir, mbox, mailcheck, and Apple Mail
+* GNU/Linux and Macintosh OS X battery status (uses [richo/dotfiles/bin/battery](https://github.com/richoH/dotfiles/blob/master/bin/battery))
+* Weather in Celsius, Fahrenheit and Kelvin using Yahoo Weather
+* System load, cpu usage and uptime
+* Git, SVN and Mercurial branch in CWD
+* Date and time
+* Hostname
+* tmux info
+* CWD in pane
+* Current X keyboard layout
+* Network download/upload speed
+* Earthquake warnings
 
 # Screenshots
 **Full screenshot**
@@ -64,23 +64,18 @@ After pausing the music there's no need for showing NP anymore. Also the weather
 
 ![right-status, no mpd](img/right-status_no_mpd.png)
 
-Remaining battery.
+Remaining battery & weather segments.
 
 ![right-status, weather and battery](img/right-status_weather_battery.png)
 
-# Project Status
-This project is accepting contributions, but currently active development on new features are paused. If you look for a more active project, check out [Lokaltog/powerline](https://github.com/Lokaltog/powerline). However this project is still functional and can serve as a lightweight alternative for those who does not want large dependencies (Lokaltog/powerline requires a Python setup on the system), as this is implemented in bash.
-
-
 # Requirements
 Requirements for the lib to work are:
-
-* Recent tmux version
+* `tmux -V` >= 2.1
 * `bash --version` >= 3.2 (Does not have to be your default shell.)
 * A patched font. Follow instructions at [Powerline Installation](http://powerline.readthedocs.org/en/latest/installation/linux.html) or [download](https://github.com/powerline/fonts) a new one. However you can use other substitute symbols as well; see `config.sh`.
 
 ## Segment Requirements
-Requirements for some segments. You only need to fulfill the requirements for those segments you want to use.
+Some segments have their own requirements. If you enable them in your theme, make sure all requirements are met for those.
 
 * `wan_ip.sh`, `now_playing.sh` (last.fm), `weather_yahoo.sh`: curl, bc
 * `now_playing.sh` (mpd) : [libmpdclient](http://sourceforge.net/projects/musicpd/files/libmpdclient/)
@@ -91,68 +86,22 @@ Requirements for some segments. You only need to fulfill the requirements for th
 * `rainbarf.sh`: [rainbarf](https://github.com/creaktive/rainbarf)
 * `weather.sh`: GNU `grep` with Perl regexp enabled (FreeBSD specific), `jq` for yrno weather API.
 
-## OS X specific requirements
-
-The `grep` tool is outdated on OS X 10.8 Mountain Lion so you might have to upgrade it.
-
-```shell
-brew install grep
-```
-
 ## FreeBSD specific requirements
-
 Preinstalled `grep` in FreeBSD doesn't support Perl regexp. Solution is rather simple -- you need to use `textproc/gnugrep` port instead. You also need to make sure, that it has support for PCRE and is compiled with `--enable-perl-regexp` flag.
 
 
 # Installation
-Start with checking out the repository with:
+1. Install [tpm](https://github.com/tmux-plugins/tpm) and make sure it's working.
+2. Install tmux-powerline as a plugin by adding a line to `tmux.conf`:
+     ```conf
+      set -g @plugin 'erikw/tmux-powerline'
+     ```
+3. Install the plugin with `<prefix>I`, unless you changed [tpm's keybindings](https://github.com/tmux-plugins/tpm#key-bindings).
+   * The default powerline should already be visible now!
+4. Continue to the [Configuration](#configuration) section below.
 
-```shell
-cd ~/some/path/
-git clone https://github.com/erikw/tmux-powerline.git
-```
+Note that tpm plugins should be at the bottom of you `tmux.conf`. This plugin will then override some tmux settings like `status-left`, `status-right` etc. If you had already set those in your tmux config, it is a good opportunity to remove or comment those out. Take a look at [main.tmux](https://github.com/erikw/tmux-powerline/blob/main/main.tmux) for exactly which settings are overridden.
 
-Now edit your `~/.tmux.conf` to use the scripts:
-
-<!-- Close syntax enough. -->
-```vim
-set-option -g status on
-set-option -g status-interval 2
-set-option -g status-justify "centre"
-set-option -g status-left-length 60
-set-option -g status-right-length 90
-set-option -g status-left "#(~/path/to/tmux-powerline/powerline.sh left)"
-set-option -g status-right "#(~/path/to/tmux-powerline/powerline.sh right)"
-set-hook -g session-created 'run-shell "~/path/to/tmux-powerline/powerline.sh init"' # prettifies the window-status segments
-```
-
-Set the maximum lengths to something that suits your configuration of segments and size of terminal (the maximum segments length will be handled better in the future).
-
-The window-status configuration is run only when a session is created, so re-running init is required to refresh the window status formats.
-
-You can toggle the visibility of the statusbars by adding the following lines:
-
-```vim
-bind C-[ run '~/path/to/tmux-powerline/mute_powerline.sh left'		# Mute left statusbar.
-bind C-] run '~/path/to/tmux-powerline/mute_powerline.sh right'		# Mute right statusbar.
-```
-
-## For tmux versions < 2.1
-
-Some segments e.g. cwd and cvs_branch needs to find the current working directory of the active pane. To achieve this we let tmux save the path each time the shell prompt is displayed. Put the line below in your `~/.bashrc` or where you define you PS1 variable. zsh users can put it in e.g. `~/.zshrc` and may change `PS1` to `PROMPT` (but that's not necessary).
-
-```bash
-PS1="$PS1"'$([ -n "$TMUX" ] && tmux setenv TMUXPWD_$(tmux display -p "#D" | tr -d %) "$PWD")'
-```
-
-
-If the active shell is Fish, PS1 is not being set normally. Instead, it has a `fish_prompt` function that is being called when prompt rendering is required. This means that one can append the following command at the end of the function in `fish_prompt.fish` file:
-
-```fish
-if set -q TMUX; tmux setenv TMUXPWD_(tmux display -p "#D" | tr -d '%') $PWD; end
-```
-
-If you have a recent version of tmux (&ge; 2.1), there is no need to redefine the PS1 variable since tmux can be called directly to query the working directory of the active pane.
 
 ## Rambox specific (rambox notification count segment)
 
@@ -178,24 +127,52 @@ This code snippet overwrites the default ``updateBadge`` function of the Matterm
 updates.
 
 # Configuration
+tmux-powerline stores the custom config, themes and segments at `$XDG_CONFIG_HOME/tmux-powerline/`.
 
-The default segments that are shown are defined in `themes/default.sh`. You will probably want to change those to fit your needs. To do so you can edit that file directly but preferable, for easier updating of the repo, you can make a copy and edit that one (or see how to use custom themes directory below). A palette of colors that can be used can be obtained by running the script `color_palette.sh`.
+To make the following example easier, let's assume the following:
+* `$XDG_CONFIG_HOME` has the default value of `~/.config`
+* tmux-powerline was installed to the XDG path `~/.config/tmux/plugins/tmux-powerline`
 
+Adapt the commands below if your paths differs from this.
+
+## Config file
+Start by generating your own configuration file:
 ```shell
-cp themes/default.sh themes/mytheme.sh
-$EDITOR themes/mytheme.sh
+~/.config/tmux/plugins/tmux-powerline/generate_rc.sh
+mv ~/.config/tmux-powerline/config.sh.default ~/.config/tmux-powerline/config.sh
+$EDITOR ~/.config/tmux-powerline/config.sh
 ```
-Now  generate a default configuration file by doing
 
+Go through the default config and adjust to you needs!
+
+## Custom theme
+The theme is specified by setting the environment variable `$TMUX_POWERLINE_THEME` in the config file above. It will use a default theme and you probably want to use your own. The default config have set the custom theme path to be `~/.config/tmux-powerline/themes/`.
+
+Make a copy of the default theme and make your own, say `my-theme`:
 ```shell
-./generate_rc.sh
-mv ~/.tmux-powerlinerc.default ~/.tmux-powerlinerc   # or to $XDG_CONFIG_HOME/tmux-powerline/config.sh
-$EDITOR ~/.tmux-powerlinerc
+mkdir -p ~/.config/tmux-powerline/themes
+cp ~/.config/tmux/plugins/tmux-powerline/themes/default.sh ~/.config/tmux-powerline/themes/my-theme.sh
+$EDITOR ~/.config/tmux-powerline/themes/my-theme.sh.default
 ```
-and change theme to use and values for segments you want to use. If you want to keep the repo checkout clean you can set custom segment and theme paths in the general section and then store your files outside the repo.
+
+Remember to update the configuration file to use the new theme by setting `TMUX_POWERLINE_THEME=my-theme`
+
+## Custom segments
+In the same was as themes, you can create your own segments at `TMUX_POWERLINE_DIR_USER_SEGMENTS` which defaults to `~/.config/tmux-powerline/segments`.
+
+To get started, copy an existing segment that is similar to the segment that you want to create.
+```shell
+mkdir -p ~/.config/tmux-powerline/segmentss
+cp ~/.config/tmux/plugins/tmux-powerline/segments/date.sh ~/.config/tmux-powerline/themes/my-segment.sh
+$EDITOR ~/.config/tmux-powerline/themes/my-segment.sh.default
+```
+
+Now you can add `my-segment` to your own theme!
+
+Also see [How to make a segment](#How-to-make-a-segment) below for more details.
+
 
 # Debugging
-
 Some segments might not work on your system for various reasons such as missing programs or different versions not having the same options. To find out which segment is not working it may help to enable the debug setting in `~/.tmux-powerlinerc`. However this may not be enough to determine the error so you can inspect all executed bash commands (will be a long output) by doing
 
 ```shell
@@ -218,11 +195,14 @@ less /tmp/tmux-powerline.log
 tail -f /tmp/tmux-powerline.log # or follow output like this.
 ```
 
+
+You can also enable the debug mode in your config file. Look for the `TMUX_POWERLINE_DEBUG_MODE_ENABLED` environment variable and set it to `true`.
+
 If you can not solve the problems you can post an [issue](https://github.com/erikw/tmux-powerline/issues?state=open) and be sure to include relevant information about your system and script output (from bash -x) and/or screenshots if needed.  Be sure to search in the [resolved issues](https://github.com/erikw/tmux-powerline/issues?page=1&state=closed) section for similar problems you're experiencing before posting.
 
+
+
 ## Common problems
-
-
 ### VCS_branch / PWD is not updating
 The issue is probably that the update of the current directory in the active pane is not updated correctly. Make sure that your PS1 or PROMPT variable actually contains the line from the installation step above by simply inspecting the output of `echo $PS1`. You might have placed the PS1 line in you shell configuration such that it is overwritten later. The simplest solution is to put it at the very end to make sure that nothing overwrites it. See [issue #52](https://github.com/erikw/tmux-powerline/issues/52).
 
@@ -232,16 +212,22 @@ You have edited `~/.tmux.conf` but no powerline is displayed. This might be beca
 ```shell
 tmux source-file ~/.tmux.conf
 ```
-### Multiple lines in bash or no powerline in zsh using iTerm (OS X)
+### Multiple lines in bash or no powerline in zsh using iTerm (macOS)
 If your tmux looks like [this](https://github.com/erikw/tmux-powerline/issues/125) then you may have to in iTerm uncheck [Unicode East Asian Ambiguous characters are wide] in Preferences -> Settings -> Advanced.
 
-# Hacking
 
+
+# Hacking
 This project can only gain positively from contributions. Fork today and make your own enhancements and segments to share back! If you'd like, add your name and E-mail to AUTHORS before making a pull request so you can get some credit for your work :-)
 
 ## How to make a segment
-If you want to (of course you do!) send a pull request for a cool segment you written make sure that it follows the style of existing segments, unless you have good reason for it. Each segment resides in the `segments/` directory with a descriptive and simple name. A segment must have at least one function and that is `run_segment` which is like the main function that is called from the tmux-powerline lib. What ever text is echoed out from this function to stdout is the text displayed in the tmux statusbar. If the segment at a certain point does not have anything to show, simply don't echo anything out and the segment will be hidden. A successful execution of the `run_segment` function should return an exit code of 0. If the segment failed to execute in a fatal way return a non-zero exit code so the user can pick up the error and fix it when debug mode is on (e.g. missing program that is needed for the segment).
+If you want to (of course you do!) send a pull request for a cool segment you written make sure that it follows the style of existing segments, unless you have good reason for it. Each segment resides in the `segments/` directory with a descriptive and simple name. A segment must have at least one function and that is `run_segment` which is like the main function that is called from the tmux-powerline lib. What ever text is echoed out from this function to stdout is the text displayed in the tmux status bar. If the segment at a certain point does not have anything to show, simply don't echo anything out and the segment will be hidden. A successful execution of the `run_segment` function should return an exit code of 0. If the segment failed to execute in a fatal way return a non-zero exit code so the user can pick up the error and fix it when debug mode is on (e.g. missing program that is needed for the segment).
 
 Usage of helper function to organize the work of a segment is encourage and should be named in the format `__helper_func`. If a segment has settings it should have a function `generate_rc` which outputs default values of all settings and a short explanation of the setting and its values. Study e.g. `segments/now_playing.sh` to see how it is done. A segment having settings should typically call a helper function `__process_settings` as the first statement in `run_segment` that sets default values to the settings that has not been set by the user.
 
-Also, don't use bash4 features as requiring bash4 complicates installation for OS X user quite a bit. Use tabs for indentation ([discussion](https://github.com/erikw/tmux-powerline/pull/92)),
+Also, don't use bash4 features as requiring bash4 complicates installation for macOS user quite a bit. Use tabs for indentation ([discussion](https://github.com/erikw/tmux-powerline/pull/92)),
+
+
+# More tmux plugins
+I have another tmux plugin that might interest you:
+* [tmux-dark-notify](https://github.com/erikw/tmux-dark-notify) - A plugin that make tmux's theme follow macOS dark/light mode.
