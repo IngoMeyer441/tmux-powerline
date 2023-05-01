@@ -1,7 +1,14 @@
-# tmux-powerline
-[![GitHub Stars](https://img.shields.io/github/stars/erikw/tmux-powerline?style=social)](#)
-[![GitHub Forks](https://img.shields.io/github/forks/erikw/tmux-powerline?style=social)](#)
-<br>
+<p align="center">
+<img alt="log" width="50%" height="50%" src="img/logo.png" />
+</p>
+<p align="center"><i>Empowering your tmux (status bar) experience!</i></p>
+<hr>
+
+<p align="center">
+<img alt="GitHub Stars" src="https://img.shields.io/github/stars/erikw/tmux-powerline?style=social" />
+<img alt="GitHub Forks" src="https://img.shields.io/github/forks/erikw/tmux-powerline?style=social" />
+</p>
+
 <!-- [![Lint Code Base](https://github.com/erikw/tmux-powerline/actions/workflows/linter.yml/badge.svg)](https://github.com/erikw/tmux-powerline/actions/workflows/linter.yml) -->
 [![SLOC](https://img.shields.io/tokei/lines/github/erikw/tmux-powerline?logo=codefactor&logoColor=lightgrey)](#)
 [![Number of programming languages used](https://img.shields.io/github/languages/count/erikw/tmux-powerline)](#)
@@ -21,7 +28,7 @@
 
 
 # Intro
-This tmux [tpm](https://github.com/tmux-plugins/tpm) plugin that gives you a slick and hackable powerline status bar consisting of segments. It's easily extensible with custom segments and themes. The plugin itself is implemented purely in bash thus minimizing system requirements. However you can make segments in any language you want (with a shell wrapper).
+tmux-powerline is a tmux <a title="Tmux Plugin Manager" href="https://github.com/tmux-plugins/tpm">tpm</a> plugin that gives you a slick and hackable powerline status bar consisting of segments. It's easily extensible with custom segments and themes. The plugin itself is implemented purely in bash thus minimizing system requirements. However you can make segments in any language you want (with a shell wrapper).
 
 Some examples of segments available that you can add to your tmux status bar are:
 * LAN & WAN IP addresses
@@ -60,11 +67,11 @@ Now I've read my inbox so the mail segment disappears!
 
 ![right-status, no mail](img/right-status_no_mail.png)
 
-After pausing the music there's no need for showing NP anymore. Also the weather has become much nicer!
+After pausing the music there's no need for showing the Now Playing segment anymore. Also the weather has become much nicer!
 
 ![right-status, no mpd](img/right-status_no_mpd.png)
 
-Remaining battery & weather segments.
+Laptop mode: a battery segment.
 
 ![right-status, weather and battery](img/right-status_weather_battery.png)
 
