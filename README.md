@@ -1,5 +1,5 @@
 <p align="center">
-<img alt="log" width="50%" height="50%" src="img/logo.png" />
+<img alt="log" width="100%" height="100%" src="img/logo.png" />
 </p>
 <p align="center"><i>Empowering your tmux (status bar) experience!</i></p>
 <hr>
@@ -85,7 +85,9 @@ Requirements for the lib to work are:
 Some segments have their own requirements. If you enable them in your theme, make sure all requirements are met for those.
 
 * `wan_ip.sh`, `now_playing.sh` (last.fm), `weather_yahoo.sh`: curl, bc
-* `now_playing.sh` (mpd) : [libmpdclient](http://sourceforge.net/projects/musicpd/files/libmpdclient/)
+* `now_playing.sh`
+  * mpd: [libmpdclient](http://sourceforge.net/projects/musicpd/files/libmpdclient/)
+  * last.fm: `jq`
 * `xkb_layout.sh`: X11, XKB
 * `mailcount.sh` (gmail): wget, (mailcheck): [mailcheck](http://packages.debian.org/sid/mailcheck).
 * `ifstat.sh`: ifstat (there is a simpler segment not using ifstat but samples /sys/class/net)
