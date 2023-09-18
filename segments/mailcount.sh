@@ -218,7 +218,7 @@ __count_thunderbird() {
     # Credits go to wognatn, see https://support.mozilla.org/en-US/questions/1242684
 	local path
 	while read -r path; do
-		if tac "${path}/INBOX.msf" | grep -m 1 '(^94=.)' | grep -q -v '(^94=0)'; then
+		if tac "${path}/INBOX.msf" | grep -m 1 '(^93=.)' | grep -q -v '(^93=0)'; then
 			return 0
 		fi
 	done < <(tr ':' '\n' <<< "${TMUX_POWERLINE_SEG_MAILCOUNT_THUNDERBIRD_MAILBOX_PATHS}")
