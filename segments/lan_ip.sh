@@ -13,10 +13,9 @@ run_segment() {
 		done
 	else
 		# Get the names of all attached NICs.
-		all_nics="$(ip addr show | cut -d ' ' -f2 | tr -d :)"
-		all_nics=(${all_nics[@]/lo/})	 # Remove lo interface.
-
-		for nic in "${all_nics[@]}"; do
+		all_nics="$(ip addr show | grep 'state UP' | cut -d ' ' -f2 | tr -d : | sort)"
+		read -ra all_nics_array <<< "$all_nics"
+		for nic in "${all_nics_array[@]}"; do
 			# Parse IP address for the NIC.
 			lan_ip="$(ip addr show ${nic} | grep '\<inet\>' | tr -s ' ' | cut -d ' ' -f3)"
 			# Trim the CIDR suffix.
