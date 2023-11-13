@@ -1,21 +1,21 @@
 # LICENSE This code is not under the same license as the rest of the project as it's "stolen". It's cloned from https://github.com/richoH/dotfiles/blob/master/bin/battery and just some modifications are done so it works for my laptop. Check that URL for more recent versions.
 
 TMUX_POWERLINE_SEG_BATTERY_TYPE_DEFAULT="percentage"
-TMUX_POWERLINE_SEG_BATTERY_NUM_SYMBOLS_DEFAULT=5
-TMUX_POWERLINE_SEG_BATTERY_SYMBOL_FULL_DEFAULT="♥"
-TMUX_POWERLINE_SEG_BATTERY_SYMBOL_EMPTY_DEFAULT="♡"
+TMUX_POWERLINE_SEG_BATTERY_NUM_BATTERIES_DEFAULT=5
 TMUX_POWERLINE_SEG_BATTERY_VIEW_THRESHOLD_DEFAULT="100"
+
+BATTERY_FULL="󱊣"
+BATTERY_MED="󱊢"
+BATTERY_EMPTY="󱊡"
+BATTERY_CHARGE="󰂄"
+ADAPTER="󰚥"
 
 generate_segmentrc() {
 	read -d '' rccontents  << EORC
 # How to display battery remaining. Can be {percentage, cute}.
 export TMUX_POWERLINE_SEG_BATTERY_TYPE="${TMUX_POWERLINE_SEG_BATTERY_TYPE_DEFAULT}"
-# How many symbols to show if cute indicators are used.
-export TMUX_POWERLINE_SEG_BATTERY_NUM_SYMBOLS="${TMUX_POWERLINE_SEG_BATTERY_NUM_SYMBOLS_DEFAULT}"
-# Which symbol to use for the percentage view or for a full battery in cute mode.
-export TMUX_POWERLINE_SEG_BATTERY_SYMBOL_FULL="${TMUX_POWERLINE_SEG_BATTERY_SYMBOL_FULL_DEFAULT}"
-# Which symbol to use in cute mode when the battery is not fully charged.
-export TMUX_POWERLINE_SEG_BATTERY_SYMBOL_EMPTY="${TMUX_POWERLINE_SEG_BATTERY_SYMBOL_EMPTY_DEFAULT}"
+# How may hearts to show if cute indicators are used.
+export TMUX_POWERLINE_SEG_BATTERY_NUM_HEARTS="${TMUX_POWERLINE_SEG_BATTERY_NUM_BATTERIES_DEFAULT}"
 # Charge level threshold to show the segment. '100' means the segment is always visible.
 export TMUX_POWERLINE_SEG_BATTERY_VIEW_THRESHOLD="${TMUX_POWERLINE_SEG_BATTERY_VIEW_THRESHOLD_DEFAULT}"
 EORC
@@ -34,7 +34,7 @@ run_segment() {
 
 	case "$TMUX_POWERLINE_SEG_BATTERY_TYPE" in
 		"percentage")
-			output="${TMUX_POWERLINE_SEG_BATTERY_SYMBOL_FULL} ${battery_status}%"
+			output="${battery_status}%"
 			;;
 		"cute")
 			output=$(__cutinate $battery_status)
@@ -48,14 +48,8 @@ __process_settings() {
 	if [ -z "$TMUX_POWERLINE_SEG_BATTERY_TYPE" ]; then
 		export TMUX_POWERLINE_SEG_BATTERY_TYPE="${TMUX_POWERLINE_SEG_BATTERY_TYPE_DEFAULT}"
 	fi
-	if [ -z "$TMUX_POWERLINE_SEG_BATTERY_NUM_SYMBOLS" ]; then
-		export TMUX_POWERLINE_SEG_BATTERY_NUM_SYMBOLS="${TMUX_POWERLINE_SEG_BATTERY_NUM_SYMBOLS_DEFAULT}"
-	fi
-	if [ -z "$TMUX_POWERLINE_SEG_BATTERY_SYMBOL_FULL" ]; then
-		export TMUX_POWERLINE_SEG_BATTERY_SYMBOL_FULL="${TMUX_POWERLINE_SEG_BATTERY_SYMBOL_FULL_DEFAULT}"
-	fi
-	if [ -z "$TMUX_POWERLINE_SEG_BATTERY_SYMBOL_EMPTY" ]; then
-		export TMUX_POWERLINE_SEG_BATTERY_SYMBOL_EMPTY="${TMUX_POWERLINE_SEG_BATTERY_SYMBOL_EMPTY_DEFAULT}"
+	if [ -z "$TMUX_POWERLINE_SEG_BATTERY_NUM_HEARTS" ]; then
+		export TMUX_POWERLINE_SEG_BATTERY_NUM_HEARTS="${TMUX_POWERLINE_SEG_BATTERY_NUM_BATTERIES_DEFAULT}"
 	fi
 	if [ -z "$TMUX_POWERLINE_SEG_BATTERY_VIEW_THRESHOLD" ]; then
 		export TMUX_POWERLINE_SEG_BATTERY_VIEW_THRESHOLD="${TMUX_POWERLINE_SEG_BATTERY_VIEW_THRESHOLD_DEFAULT}"
@@ -75,15 +69,26 @@ __battery_osx() {
 					export curcap=$value;;
 				"ExternalConnected")
 					export extconnect=$value;;
-				"FullyCharged")
-					export fully_charged=$value;;
+        "FullyCharged")
+          export fully_charged=$value;;
 			esac
 			if [[ -n $maxcap && -n $curcap && -n $extconnect ]]; then
-				if [[ "$curcap" == "$maxcap" || "$fully_charged" == "Yes" && $extconnect == "Yes"  ]]; then
+				charge=`pmset -g batt | grep -o "[0-9][0-9]*\%" | rev | cut -c 2- | rev`
+				if [[ ("$fully_charged" == "Yes" || $charge -eq 100)  && $extconnect == "Yes"  ]]; then
 					return
 				fi
-				charge=`pmset -g batt | grep -o "[0-9][0-9]*\%" | rev | cut -c 2- | rev`
-				echo "$charge"
+				if [[ "$extconnect" == "Yes" ]]; then
+					echo "$BATTERY_CHARGE $charge"
+				else
+					if [[ $charge -lt 50 ]]; then
+						echo -n "#[fg=#ff0000]"
+						echo "$BATTERY_EMPTY $charge"
+					elif [[ $charge -lt 80 ]]; then
+						echo "$BATTERY_MED $charge"
+					else
+						echo "$BATTERY_FULL $charge"
+					fi
+				fi
 				break
 			fi
 		done
@@ -133,14 +138,14 @@ __battery_osx() {
 
 	__cutinate() {
 		perc=$1
-		inc=$(( 100 / $TMUX_POWERLINE_SEG_BATTERY_NUM_SYMBOLS ))
+		inc=$(( 100 / $TMUX_POWERLINE_SEG_BATTERY_NUM_HEARTS ))
 
 
-		for i in `seq $TMUX_POWERLINE_SEG_BATTERY_NUM_SYMBOLS`; do
+		for i in `seq $TMUX_POWERLINE_SEG_BATTERY_NUM_HEARTS`; do
 			if [ $perc -lt 99 ]; then
-				echo -n $TMUX_POWERLINE_SEG_BATTERY_SYMBOL_EMPTY
+				echo -n $BATTERY_EMPTY
 			else
-				echo -n $TMUX_POWERLINE_SEG_BATTERY_SYMBOL_FULL
+				echo -n $BATTERY_FULL
 			fi
 			echo -n " "
 			perc=$(( $perc + $inc ))
@@ -153,10 +158,10 @@ __battery_osx() {
 		if [ $bn -gt $bf ]; then
 			bn=$bf
 		fi
-		echo $(( 100 * $bn / $bf ))
+		echo "$BATTERY_MED $(( 100 * $bn / $bf ))"
 	}
 
 	__freebsd_get_bat() {
-		echo "$(sysctl -n hw.acpi.battery.life)"
+		echo "$BATTER_MED $(sysctl -n hw.acpi.battery.life)"
 
 	}
