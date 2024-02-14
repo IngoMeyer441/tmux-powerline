@@ -12,7 +12,20 @@
 # This script will print the correct layout even if layout is set per window.
 # Exit if platform is not linux or macOS as this script is dependant on X11
 
+TMUX_POWERLINE_SEG_XKB_LAYOUT_ICON_DEFAULT=" "
+
+generate_segmentrc() {
+	read -d '' rccontents  << EORC
+# Keyboard icon
+export TMUX_POWERLINE_SEG_XKB_LAYOUT_ICON="${TMUX_POWERLINE_SEG_XKB_LAYOUT_ICON_DEFAULT}"
+EORC
+	echo "$rccontents"
+}
+
+
 run_segment() {
+	__process_settings
+
 	if ! shell_is_linux && ! shell_is_osx; then
 		return 1
 	fi
@@ -46,5 +59,11 @@ run_segment() {
 		esac
 	fi
 
-	echo " $cur_layout"
+    echo "$TMUX_POWERLINE_SEG_XKB_LAYOUT_ICON$cur_layout"
+}
+
+__process_settings() {
+	if [ -z "$TMUX_POWERLINE_SEG_XKB_LAYOUT_ICON" ]; then
+		export TMUX_POWERLINE_SEG_XKB_LAYOUT_ICON="${TMUX_POWERLINE_SEG_XKB_LAYOUT_ICON_DEFAULT}"
+	fi
 }
