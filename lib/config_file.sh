@@ -1,7 +1,7 @@
-# Read user rc file.
+# Read user config file.
 
 process_settings() {
-	__read_rcfile
+	__read_config_file
 
 	if [ -z "$TMUX_POWERLINE_DEBUG_MODE_ENABLED" ]; then
 		export TMUX_POWERLINE_DEBUG_MODE_ENABLED="${TMUX_POWERLINE_DEBUG_MODE_ENABLED_DEFAULT}"
@@ -35,6 +35,10 @@ process_settings() {
 		export TMUX_POWERLINE_STATUS_RIGHT_LENGTH="${TMUX_POWERLINE_STATUS_RIGHT_LENGTH_DEFAULT}"
 	fi
 
+	if [ -z "$TMUX_POWERLINE_WINDOW_STATUS_SEPARATOR" ]; then
+		export TMUX_POWERLINE_WINDOW_STATUS_SEPARATOR="${TMUX_POWERLINE_WINDOW_STATUS_SEPARATOR_DEFAULT}"
+	fi
+
 	if [ -z "$TMUX_POWERLINE_MUTE_LEFT_KEYBINDING" ]; then
 		export TMUX_POWERLINE_MUTE_LEFT_KEYBINDING="${TMUX_POWERLINE_MUTE_LEFT_KEYBINDING_DEFAULT}"
 	fi
@@ -51,10 +55,22 @@ process_settings() {
 		source "${TMUX_POWERLINE_DIR_THEMES}/${TMUX_POWERLINE_THEME}.sh"
 	fi
 
+	# Set the default status bar colors to the theme's default colors. This section is here because it needs to be after the theme is sourced.
+	if [ -z "$TMUX_POWERLINE_STATUS_STYLE" ]; then
+		local bg_color
+		local fg_color
+
+		fg_color=$(__normalize_color "$TMUX_POWERLINE_DEFAULT_FOREGROUND_COLOR")
+		bg_color=$(__normalize_color "$TMUX_POWERLINE_DEFAULT_BACKGROUND_COLOR")
+
+		export TMUX_POWERLINE_STATUS_STYLE="fg=$fg_color,bg=$bg_color"
+	fi
+
+
 }
 
-generate_default_rc() {
-	read -d '' rccontents  << EORC
+generate_default_config() {
+	read -d '' config_contents  << EORC
 # Default configuration file for tmux-powerline.
 # Modeline {
 #	 vi: foldmarker={,} foldmethod=marker foldlevel=0 tabstop=4 filetype=sh
@@ -87,6 +103,9 @@ generate_default_rc() {
 	# The maximum length of the right status bar.
 	export TMUX_POWERLINE_STATUS_RIGHT_LENGTH="${TMUX_POWERLINE_STATUS_RIGHT_LENGTH_DEFAULT}"
 
+	# The separator to use between windows on the status bar.
+	export TMUX_POWERLINE_WINDOW_STATUS_SEPARATOR=""
+
 	# Uncomment these if you want to enable tmux bindings for muting (hiding) one of the status bars.
 	# E.g. this example binding would mute the left status bar when pressing <prefix> followed by Ctrl-[
 	#export TMUX_POWERLINE_MUTE_LEFT_KEYBINDING="C-["
@@ -100,17 +119,17 @@ EORC
 			segmentrc=$(generate_segmentrc | sed -e 's/^/\\t/g')
 			unset -f generate_segmentrc
 			local seg_name="${segment##*/}"
-			rccontents="${rccontents}\n\n# ${seg_name} {\n${segmentrc}\n# }"
+			config_contents="${config_contents}\n\n# ${seg_name} {\n${segmentrc}\n# }"
 		fi
 	done
 
-	echo -e "$rccontents" > "$TMUX_POWERLINE_RCFILE_DEFAULT"
-	echo "Default configuration file generated to: ${TMUX_POWERLINE_RCFILE_DEFAULT}"
-	echo "Copy/move it to \"${TMUX_POWERLINE_RCFILE}\" and make your changes."
+	echo -e "$config_contents" > "$TMUX_POWERLINE_CONFIG_FILE_DEFAULT"
+	echo "Default configuration file generated to: ${TMUX_POWERLINE_CONFIG_FILE_DEFAULT}"
+	echo "Copy/move it to \"${TMUX_POWERLINE_CONFIG_FILE}\" and make your changes."
 }
 
-__read_rcfile() {
-	if [  -f "$TMUX_POWERLINE_RCFILE" ]; then
-		source "$TMUX_POWERLINE_RCFILE"
+__read_config_file() {
+	if [  -f "$TMUX_POWERLINE_CONFIG_FILE" ]; then
+		source "$TMUX_POWERLINE_CONFIG_FILE"
 	fi
 }
