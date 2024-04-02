@@ -47,6 +47,18 @@ process_settings() {
 		export TMUX_POWERLINE_MUTE_RIGHT_KEYBINDING="${TMUX_POWERLINE_MUTE_RIGHT_KEYBINDING_DEFAULT}"
 	fi
 
+	if [ -z "$TMUX_POWERLINE_STATUS_FORMAT_WINDOW" ]; then
+		export TMUX_POWERLINE_STATUS_FORMAT_WINDOW="${TMUX_POWERLINE_STATUS_FORMAT_WINDOW}"
+	fi
+
+	if [ -z "$TMUX_POWERLINE_STATUS_FORMAT_LEFT" ]; then
+		export TMUX_POWERLINE_STATUS_FORMAT_LEFT="${TMUX_POWERLINE_STATUS_FORMAT_LEFT}"
+	fi
+
+	if [ -z "$TMUX_POWERLINE_STATUS_FORMAT_RIGHT" ]; then
+		export TMUX_POWERLINE_STATUS_FORMAT_RIGHT="${TMUX_POWERLINE_STATUS_FORMAT_RIGHT}"
+	fi
+
 	eval TMUX_POWERLINE_DIR_USER_SEGMENTS="$TMUX_POWERLINE_DIR_USER_SEGMENTS"
 	eval TMUX_POWERLINE_DIR_USER_THEMES="$TMUX_POWERLINE_DIR_USER_THEMES"
 	if [ -n "$TMUX_POWERLINE_DIR_USER_THEMES" ] && [ -f "${TMUX_POWERLINE_DIR_USER_THEMES}/${TMUX_POWERLINE_THEME}.sh" ]; then
@@ -89,8 +101,11 @@ generate_default_config() {
 	# Overlay directory to look for segments. There you can put your own segments outside the repo. Fallback will still be the "segments" directory in the repo.
 	export TMUX_POWERLINE_DIR_USER_SEGMENTS="\${XDG_CONFIG_HOME:-\$HOME/.config}/tmux-powerline/segments"
 
-	# The initial visibility of the status bar. Can be {"on, off"}.
+	# The initial visibility of the status bar. Can be {"on", "off", "2"}. 2 will create two status lines: one for the window list and one with status bar segments. 
 	export TMUX_POWERLINE_STATUS_VISIBILITY="${TMUX_POWERLINE_STATUS_VISIBILITY_DEFAULT}"
+	# In case of visibility = 2, where to display window status and where left/right status bars.
+	# 0: window status top, left/right status bottom; 1: window status bottom, left/right status top
+	export TMUX_POWERLINE_WINDOW_STATUS_LINE=0
 	# The status bar refresh interval in seconds.
 	# Note that events that force-refresh the status bar (such as window renaming) will ignore this.
 	export TMUX_POWERLINE_STATUS_INTERVAL="${TMUX_POWERLINE_STATUS_INTERVAL_DEFAULT}"
