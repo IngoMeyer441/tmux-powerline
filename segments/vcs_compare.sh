@@ -59,6 +59,9 @@ __parse_git_stats() {
 		local ret="#[fg=$TMUX_POWERLINE_SEG_VCS_COMPARE_BEHIND_SYMBOL_COLOUR]${TMUX_POWERLINE_SEG_VCS_COMPARE_BEHIND_SYMBOL}#[fg=$TMUX_POWERLINE_CUR_SEGMENT_FG]$behind"
 	fi
 	if [[ $ahead -gt 0 ]] ; then
+		if [[ $behind -gt 0 ]] ; then
+			local ret="${ret} "
+		fi
 		local ret="${ret}#[fg=$TMUX_POWERLINE_SEG_VCS_COMPARE_AHEAD_SYMBOL_COLOUR]${TMUX_POWERLINE_SEG_VCS_COMPARE_AHEAD_SYMBOL}#[fg=$TMUX_POWERLINE_CUR_SEGMENT_FG]$ahead"
 	fi
 	echo "$ret"
