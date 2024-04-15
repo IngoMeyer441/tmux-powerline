@@ -38,7 +38,7 @@ run_segment() {
 			return 1
 		fi
 		cur_layout_nbr=$(./xkb_layout)
-		IFS=$',' read -r -a layouts < <(setxkbmap -query | grep layout | sed 's/layout:\s\+//g')
+		IFS=$',' read -r -a layouts < <(setxkbmap -query | grep layout | sed 's/layout:\s\+//g' | awk '{ print(toupper($0)) }')
 		cur_layout="${layouts[$cur_layout_nbr]}"
 	else
 		if ! which issw >/dev/null 2>&1; then
