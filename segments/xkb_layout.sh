@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # Print the currently used keyboard layout
 # This depends on a specifically developed program which prints the group id of
 # the currently used layout.
@@ -12,26 +13,23 @@
 # This script will print the correct layout even if layout is set per window.
 # Exit if platform is not linux or macOS as this script is dependant on X11
 
-TMUX_POWERLINE_SEG_XKB_LAYOUT_ICON_DEFAULT=" "
+TMUX_POWERLINE_SEG_XKB_LAYOUT_ICON="${TMUX_POWERLINE_SEG_XKB_LAYOUT_ICON:- }"
 
 generate_segmentrc() {
-	read -d '' rccontents  << EORC
+	read -r -d '' rccontents <<EORC
 # Keyboard icon
-export TMUX_POWERLINE_SEG_XKB_LAYOUT_ICON="${TMUX_POWERLINE_SEG_XKB_LAYOUT_ICON_DEFAULT}"
+export TMUX_POWERLINE_SEG_XKB_LAYOUT_ICON="${TMUX_POWERLINE_SEG_XKB_LAYOUT_ICON}"
 EORC
 	echo "$rccontents"
 }
 
-
 run_segment() {
-	__process_settings
-
-	if ! shell_is_linux && ! shell_is_osx; then
+	if ! shell_is_linux; then
 		return 1
 	fi
 
 	if shell_is_linux; then
-		cd "$TMUX_POWERLINE_DIR_SEGMENTS"
+		cd "$TMUX_POWERLINE_DIR_SEGMENTS" || return
 		if [ ! -x "xkb_layout" ]; then
 			make clean xkb_layout &>/dev/null
 		fi
@@ -39,9 +37,9 @@ run_segment() {
 		if [ ! -x ./xkb_layout ]; then
 			return 1
 		fi
-		cur_layout_nbr=$(($(./xkb_layout)+1));
-		cur_layout=$(setxkbmap -query | grep layout | sed 's/layout:\s\+//g' | \
-            awk -F ',' '{print toupper($'$(echo "$cur_layout_nbr")')}')
+		cur_layout_nbr=$(./xkb_layout)
+		IFS=$',' read -r -a layouts < <(setxkbmap -query | grep layout | sed 's/layout:\s\+//g')
+		cur_layout="${layouts[$cur_layout_nbr]}"
 	else
 		if ! which issw >/dev/null 2>&1; then
 			return 1
@@ -60,10 +58,4 @@ run_segment() {
 	fi
 
     echo "$TMUX_POWERLINE_SEG_XKB_LAYOUT_ICON$cur_layout"
-}
-
-__process_settings() {
-	if [ -z "$TMUX_POWERLINE_SEG_XKB_LAYOUT_ICON" ]; then
-		export TMUX_POWERLINE_SEG_XKB_LAYOUT_ICON="${TMUX_POWERLINE_SEG_XKB_LAYOUT_ICON_DEFAULT}"
-	fi
 }
