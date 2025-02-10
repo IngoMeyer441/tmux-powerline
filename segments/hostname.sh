@@ -21,6 +21,13 @@ run_segment() {
 		fi
 	fi
 
-	hostname ${opts}
+	if command_exists hostname; then
+		hostname ${opts}
+	elif command_exists hostnamectl; then
+		hostnamectl hostname
+	else
+		echo 'Hostname could not be determined'
+	fi
+
 	return 0
 }
