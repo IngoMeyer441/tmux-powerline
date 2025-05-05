@@ -27,7 +27,7 @@ TMUX_POWERLINE_SEG_NOW_PLAYING_MUSIC_PLAYER_DEFAULT="spotify"
 
 generate_segmentrc() {
 	read -r -d '' rccontents <<EORC
-# Music player to use. Can be any of {audacious, banshee, cmus, apple_music, itunes, lastfm, plexamp, mocp, mpd, mpd_simple, pithos, playerctl, rdio, rhythmbox, spotify, spotify_wine, file}.
+# Music player to use. Can be any of {audacious, banshee, cmus, apple_music, itunes, lastfm, plexamp, mocp, mpd, mpd_simple, pithos, playerctl, rdio, rhythmbox, spotify, file}.
 export TMUX_POWERLINE_SEG_NOW_PLAYING_MUSIC_PLAYER="${TMUX_POWERLINE_SEG_NOW_PLAYING_MUSIC_PLAYER_DEFAULT}"
 # File to be read in case the song is being read from a file
 export TMUX_POWERLINE_SEG_NOW_PLAYING_FILE_NAME=""
@@ -122,7 +122,6 @@ run_segment() {
 		"rhythmbox") np=$(__np_rhythmbox) ;;
 		"spotify") np=$(__np_spotify) ;;
 		"file") np=$(__np_file) ;;
-		"spotify_wine") np=$(__np_spotify_native) ;;
 		*)
 			echo "Unknown music player type [${TMUX_POWERLINE_SEG_NOW_PLAYING_MUSIC_PLAYER}]"
 			return 1
@@ -293,13 +292,13 @@ __np_cmus() {
 }
 
 __np_apple_music() {
-	! shell_is_osx && return 1
+	! shell_is_macos && return 1
 	np=$("${TMUX_POWERLINE_DIR_SEGMENTS}/np_apple_music.script")
 	echo "$np"
 }
 
 __np_itunes() {
-	! shell_is_osx && return 1
+	! shell_is_macos && return 1
 	np=$("${TMUX_POWERLINE_DIR_SEGMENTS}/np_itunes.script")
 	echo "$np"
 }
@@ -310,7 +309,7 @@ __np_lastfm() {
 	local ENDPOINT_FMT="http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&format=json&limit=1&user=%s&api_key=%s"
 
 	if [ -f "$TMP_FILE" ]; then
-		if shell_is_osx || shell_is_bsd; then
+		if shell_is_macos || shell_is_bsd; then
 			last_update=$(stat -f "%m" "${TMP_FILE}")
 		elif shell_is_linux; then
 			last_update=$(stat -c "%Y" "${TMP_FILE}")
@@ -341,7 +340,7 @@ __np_plexamp() {
 	local ENDPOINT_FMT="https://%s/api/v2?cmd=get_activity&apikey=%s"
 
 	if [ -f "$TMP_FILE" ]; then
-		if shell_is_osx || shell_is_bsd; then
+		if shell_is_macos || shell_is_bsd; then
 			last_update=$(stat -f "%m" "${TMP_FILE}")
 		elif shell_is_linux; then
 			last_update=$(stat -c "%Y" "${TMP_FILE}")
@@ -385,7 +384,7 @@ __np_mocp() {
 }
 
 __np_rdio() {
-	! shell_is_osx && return 1
+	! shell_is_macos && return 1
 	np=$(osascript "${TMUX_POWERLINE_DIR_SEGMENTS}/np_rdio_mac.script")
 	echo "$np"
 }
@@ -427,18 +426,8 @@ __np_spotify() {
 				fi
 			fi
 		fi
-	elif shell_is_osx; then
+	elif shell_is_macos; then
 		np=$("${TMUX_POWERLINE_DIR_SEGMENTS}/np_spotify_mac.script")
 	fi
 	echo "$np"
-}
-
-__np_spotify_wine() {
-	! shell_is_linux && return 1
-	spotify_id=$(xwininfo -root -tree | grep '("spotify' | cut -f1 -d'"' | sed 's/ //g')
-	echo "$spotify_id"
-	if [ -n "$spotify_id" ]; then
-		np=$(xwininfo -id "$spotify_id" | grep "xwininfo.*Spotify -" | grep -Po "(?<=\"Spotify - ).*(?=\"$)")
-		echo "$np"
-	fi
 }
