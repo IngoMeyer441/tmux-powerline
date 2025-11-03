@@ -26,3 +26,7 @@ source "${TMUX_POWERLINE_DIR_LIB}/muting.sh"
 source "${TMUX_POWERLINE_DIR_LIB}/powerline.sh"
 # shellcheck source=lib/config_file.sh
 source "${TMUX_POWERLINE_DIR_LIB}/config_file.sh"
+# shellcheck source=lib/cpu_temp_helper.sh
+source "${TMUX_POWERLINE_DIR_LIB}/cpu_temp_helper.sh"
+# shellcheck source=lib/mem_used_helper.sh
+source "${TMUX_POWERLINE_DIR_LIB}/mem_used_helper.sh"
