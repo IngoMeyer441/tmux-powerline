@@ -86,7 +86,7 @@ tp_process_settings() {
 		fg_color=$(__normalize_color "$TMUX_POWERLINE_DEFAULT_FOREGROUND_COLOR")
 		bg_color=$(__normalize_color "$TMUX_POWERLINE_DEFAULT_BACKGROUND_COLOR")
 
-		export TMUX_POWERLINE_STATUS_STYLE="fg=$fg_color,bg=$bg_color"
+		export TMUX_POWERLINE_STATUS_STYLE="fg=$fg_color,bg=$bg_color,fill=$bg_color"
 	fi
 }
 
