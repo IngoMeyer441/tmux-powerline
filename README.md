@@ -57,6 +57,7 @@ Some examples of segments available that you can add to your tmux status bar are
 * Current X keyboard layout
 * Network download/upload speed
 * Earthquake warnings
+* Claude Code subscription usage: session/weekly limits, time remaining (session/weekly/billing cycle), and optional accumulated cost
 
 # Screenshots
 **Full screenshot**
@@ -103,6 +104,7 @@ Requirements for the lib to work are:
 ## Segment Requirements
 Some segments have their own requirements. If you enable them in your theme, make sure all requirements are met for those.
 
+* **claude_code.sh**: `jq`, `curl` and [`ccusage`](https://github.com/ryoppippi/ccusage) (only if you enable the accumulated cost display)
 * **cpu_temp.sh**: `lm_sensors` for Linux, [smctemp](https://github.com/narugit/smctemp) for Macos
 * **dropbox_status.sh**: `dropbox-cli`
 * **github_notifications.sh**: `jq`, `curl`
